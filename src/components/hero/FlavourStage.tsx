@@ -10,10 +10,10 @@ type Flavour = { name: string; tint: string; bowl?: string; hue: string };
 // Bowls without their own photo fall back to the Chilly BBQ bowl with a CSS tint.
 export const FLAVOURS: Flavour[] = [
   { name: "Chilly BBQ", tint: "var(--tint-bbq)", bowl: bowlBbq, hue: "none" },
-  { name: "Cheese", tint: "var(--tint-cheese)", hue: "hue-rotate(25deg) saturate(1.3) brightness(1.08)" },
-  { name: "Sweet Corn", tint: "var(--tint-corn)", hue: "hue-rotate(35deg) saturate(0.9) brightness(1.15)" },
-  { name: "Sour Cream & Onion", tint: "var(--tint-sco)", hue: "hue-rotate(70deg) saturate(0.6) brightness(1.15)" },
-  { name: "Chilly Lemon", tint: "var(--tint-lemon)", hue: "hue-rotate(45deg) saturate(1.1) brightness(1.1)" },
+  { name: "Cheese", tint: "var(--tint-cheese)", hue: "sepia(0.25) saturate(0.85) brightness(1.15)" },
+  { name: "Sweet Corn", tint: "var(--tint-corn)", hue: "saturate(0.6) brightness(1.25)" },
+  { name: "Sour Cream & Onion", tint: "var(--tint-sco)", hue: "saturate(0.35) brightness(1.3)" },
+  { name: "Chilly Lemon", tint: "var(--tint-lemon)", hue: "hue-rotate(8deg) saturate(0.7) brightness(1.2)" },
 ];
 
 const SWAPS = [6.8, 8.1, 9.4, 10.7]; // flavours 1..4
