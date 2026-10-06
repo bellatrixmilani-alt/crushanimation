@@ -191,7 +191,7 @@ export function FlavourStage({ onDone }: { onDone?: () => void }) {
             draggable={false}
             style={{ filter: f.bowl ? "none" : f.hue, clipPath: `inset(${lerp(48, 0, isStatic ? 1 : fill)}% 0 0 0)` }}
           />
-          {(T >= 6.8 || isStatic) && sinceSwap >= 0 && sinceSwap < 0.7 && <SparkRing p={sinceSwap / 0.7} />}
+          {(T >= 6.8 || isStatic) && sinceSwap >= 0 && sinceSwap < 0.7 && <SparkRing p={sinceSwap / 0.7} color={f.tint} />}
         </div>
 
         {/* Falling fries */}
@@ -228,15 +228,7 @@ export function FlavourStage({ onDone }: { onDone?: () => void }) {
 
         {/* Controls */}
         <div className="absolute bottom-[3%] right-[3%] z-10 flex gap-2">
-          {done && !isStatic && (
-            <button
-              onClick={() => { track("replay_click"); restart(); }}
-              className="rounded-full border-2 border-ink bg-cream px-3 py-1.5 text-xs font-bold uppercase text-ink hard-shadow"
-            >
-              ↻ Replay
-            </button>
-          )}
-          {isStatic && (
+          {done && (
             <button
               onClick={() => { track("replay_click"); restart(); }}
               className="rounded-full border-2 border-ink bg-cream px-3 py-1.5 text-xs font-bold uppercase text-ink hard-shadow"
@@ -293,7 +285,7 @@ function ShakeFx({ t }: { t: number }) {
   );
 }
 
-function SparkRing({ p }: { p: number }) {
+function SparkRing({ p, color }: { p: number; color: string }) {
   return (
     <div className="pointer-events-none absolute left-1/2 top-[45%]">
       {Array.from({ length: 18 }, (_, i) => {
@@ -303,7 +295,7 @@ function SparkRing({ p }: { p: number }) {
           <span
             key={i}
             className="absolute rounded-full border border-ink"
-            style={{ width: "1.6cqw", height: "1.6cqw", left: `${Math.cos(a) * r}cqw`, top: `${Math.sin(a) * r * 0.8}cqw`, background: "inherit", backgroundColor: "var(--stage-spark, var(--primary))", opacity: 1 - p }}
+            style={{ width: "1.6cqw", height: "1.6cqw", left: `${Math.cos(a) * r}cqw`, top: `${Math.sin(a) * r * 0.8}cqw`, backgroundColor: color, filter: "saturate(1.6) brightness(0.9)", opacity: 1 - p }}
           />
         );
       })}
