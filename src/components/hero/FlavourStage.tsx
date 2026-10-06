@@ -103,7 +103,7 @@ export function FlavourStage({ onDone }: { onDone?: () => void }) {
   }, []);
 
   const pick = (i: number) => {
-    track("flavour_chip_click", { flavour: FLAVOURS[i].name });
+    track("flavour_chip_click", { flavour: FLAVOURS[i]?.name });
     if (i === 0) return restart();
     setMode({ kind: "static", flavour: i, swapAt: elapsed.current });
     if (soundRef.current) { sfx.pop(); setTimeout(sfx.tick, 80); }
@@ -136,7 +136,7 @@ export function FlavourStage({ onDone }: { onDone?: () => void }) {
   const popScale = sinceSwap >= 0 && sinceSwap < 0.25 ? lerp(1.12, 1, sinceSwap / 0.25) : 1;
   const pillShow = T >= 4.6;
   const pillScale = sinceSwap >= 0 && sinceSwap < 0.3 ? lerp(0.6, 1, ease(sinceSwap / 0.3)) : 1;
-  const f = FLAVOURS[flavour];
+  const f = FLAVOURS[flavour] ?? FLAVOURS[0]!;
 
   // Mascot box (stage %): left 60, width 34, bottom 18.
   const bowl = {
