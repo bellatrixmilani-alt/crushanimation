@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import mascotHold from "@/assets/mascot-hold.webp";
-import mascotPour from "@/assets/mascot-pour.webp";
-import tinGloves from "@/assets/tin-gloves.webp";
+import mascotBody from "@/assets/potato-body.webp";
+import mascotTin from "@/assets/potato-tin.webp";
+import mascotPour from "@/assets/potato-pour.webp";
+import mascotCollect from "@/assets/potato-collect.webp";
+import bowlLogo from "@/assets/chipoz-logo.png.asset.json";
+import { Button } from "@/components/ui/button";
 import bowlBbq from "@/assets/bowl-bbq.webp";
 import { enableSound, sfx } from "./sound";
 import { track } from "@/lib/track";
@@ -18,6 +21,7 @@ export const FLAVOURS: Flavour[] = [
 
 const SWAPS = [6.8, 8.1, 9.4, 10.7]; // flavours 1..4
 const END = 12;
+const COLLECT_DURATION = 1.4;
 const FRIES = 38;
 const lerp = (a: number, b: number, p: number) => a + (b - a) * p;
 const clamp = (p: number) => Math.max(0, Math.min(1, p));
@@ -31,7 +35,7 @@ const fries = Array.from({ length: FRIES }, (_, i) => {
     start: 2.65 + (i / FRIES) * 1.4,
     dur: 0.5 + r(1) * 0.25,
     x1: 14 + r(2) * 18,
-    y1: 66 + r(3) * 6,
+    y1: 76 + r(3) * 4,
     arc: 6 + r(4) * 10,
     spin: (r(5) > 0.5 ? 1 : -1) * (300 + r(6) * 400),
   };
@@ -40,7 +44,7 @@ const fries = Array.from({ length: FRIES }, (_, i) => {
 type Mode = { kind: "auto" } | { kind: "static"; flavour: number; swapAt: number };
 
 export function FlavourStage({ onDone }: { onDone?: () => void }) {
-  const [t, setT] = useState(0);
+  const [t, setT] = useState(-COLLECT_DURATION);
   const [mode, setMode] = useState<Mode>({ kind: "auto" });
   const [now, setNow] = useState(0);
   const [sound, setSound] = useState(false);
@@ -79,7 +83,7 @@ export function FlavourStage({ onDone }: { onDone?: () => void }) {
   const autoStart = useRef(0);
   useEffect(() => {
     if (mode.kind !== "auto") return;
-    const nt = Math.min(END + 1, now - autoStart.current);
+    const nt = Math.min(END + 1, now - autoStart.current - COLLECT_DURATION);
     const p = prevT.current;
     if (soundRef.current) {
       const crossed = (x: number) => p < x && nt >= x;
@@ -98,7 +102,7 @@ export function FlavourStage({ onDone }: { onDone?: () => void }) {
   const restart = useCallback(() => {
     autoStart.current = elapsed.current;
     prevT.current = 0;
-    setT(0);
+    setT(-COLLECT_DURATION);
     setMode({ kind: "auto" });
   }, []);
 
@@ -126,6 +130,7 @@ export function FlavourStage({ onDone }: { onDone?: () => void }) {
   const sinceSwap = isStatic ? now - mode.swapAt : T - swapT;
   const done = isStatic || T >= END;
 
+  const collecting = !isStatic && T < 0;
   const shaking = T >= 0.5 && T < 2.4;
   const pouring = T >= 2.5;
   const shakeX = shaking ? Math.sin(T * Math.PI * 2 * 12) * 5 : 0;
@@ -136,9 +141,10 @@ export function FlavourStage({ onDone }: { onDone?: () => void }) {
   const popScale = sinceSwap >= 0 && sinceSwap < 0.25 ? lerp(1.12, 1, sinceSwap / 0.25) : 1;
   const pillShow = T >= 4.6;
   const pillScale = sinceSwap >= 0 && sinceSwap < 0.3 ? lerp(0.6, 1, ease(sinceSwap / 0.3)) : 1;
-  const f = FLAVOURS[flavour] ?? FLAVOURS[0]!;
+  const f = FLAVOURS[flavour] ?? FLAVOURS[0];
+  if (!f) return null;
 
-  // Mascot box (stage %): left 60, width 34, bottom 18.
+  // Mascot box (stage %): left 60, width 34, bottom 26.
   const bowl = {
     left: lerp(6, 20, glide),
     width: lerp(34, 60, glide),
@@ -157,13 +163,15 @@ export function FlavourStage({ onDone }: { onDone?: () => void }) {
         {leave < 1 && (
           <div
             className="absolute"
-            style={{ left: "60%", width: "34%", bottom: "18%", aspectRatio: "768 / 1024", transform: `translateX(${leave * 120}%)`, opacity: 1 - leave }}
+            style={{ left: "60%", width: "34%", bottom: "26%", aspectRatio: "896 / 1200", transform: `translateX(${leave * 120}%)`, opacity: 1 - leave }}
           >
-            <img src={pouring ? mascotPour : mascotHold} alt="" className="absolute inset-0 h-full w-full" draggable={false} />
-            {!pouring && (
-              <div className="absolute" style={{ left: "-6%", top: "33%", width: "60%", transform: `translateX(${shakeX}px)` }}>
-                <img src={tinGloves} alt="" className="w-full" draggable={false} />
-                {shaking && <ShakeFx t={T} />}
+            <img src={collecting ? mascotCollect : pouring ? mascotPour : mascotBody} alt="" className="absolute inset-0 h-full w-full" draggable={false} />
+            {!collecting && !pouring && (
+              <img src={mascotTin} alt="" className="absolute inset-0 h-full w-full" draggable={false} style={{ transform: `translateX(${shakeX}px)` }} />
+            )}
+            {shaking && (
+              <div className="absolute" style={{ left: "15%", top: "56%", width: "70%", height: "20%" }}>
+                <ShakeFx t={T} />
               </div>
             )}
             {/* Lid popping off */}
@@ -171,7 +179,7 @@ export function FlavourStage({ onDone }: { onDone?: () => void }) {
               <div
                 className="absolute rounded-full border-2 border-ink bg-muted-foreground"
                 style={{
-                  left: "2%", top: "48%", width: "6%", aspectRatio: "1 / 2.4",
+                  left: "12%", top: "77%", width: "6%", aspectRatio: "1 / 2.4",
                   transform: `translate(${-prog(T, 2.5, 3.3) * 120}cqw, ${(-30 * prog(T, 2.5, 3.3) + 140 * prog(T, 2.5, 3.3) ** 2) * 1}%) rotate(${prog(T, 2.5, 3.3) * -540}deg)`,
                 }}
               />
@@ -191,6 +199,12 @@ export function FlavourStage({ onDone }: { onDone?: () => void }) {
             draggable={false}
             style={{ filter: f.bowl ? "none" : f.hue, clipPath: `inset(${lerp(48, 0, isStatic ? 1 : fill)}% 0 0 0)` }}
           />
+          <img
+            src={bowlLogo.url}
+            alt=""
+            draggable={false}
+            className="absolute left-[32%] top-[59%] w-[36%]"
+          />
           {(T >= 6.8 || isStatic) && sinceSwap >= 0 && sinceSwap < 0.7 && <SparkRing p={sinceSwap / 0.7} color={f.tint} />}
         </div>
 
@@ -200,7 +214,7 @@ export function FlavourStage({ onDone }: { onDone?: () => void }) {
             const p = (T - fr.start) / fr.dur;
             if (p < 0 || p > 1) return null;
             const x = lerp(63, fr.x1, p);
-            const y = lerp(56, fr.y1, p * p) - fr.arc * 4 * p * (1 - p) * 0.5;
+            const y = lerp(61, fr.y1, p * p) - fr.arc * 4 * p * (1 - p) * 0.5;
             return (
               <span
                 key={i}
@@ -229,17 +243,17 @@ export function FlavourStage({ onDone }: { onDone?: () => void }) {
         {/* Controls */}
         <div className="absolute bottom-[3%] right-[3%] z-10 flex gap-2">
           {done && (
-            <button
+            <Button variant="ghost"
               onClick={() => { track("replay_click"); restart(); }}
               className="rounded-full border-2 border-ink bg-cream px-3 py-1.5 text-xs font-bold uppercase text-ink hard-shadow"
             >
               ↻ Replay
-            </button>
+            </Button>
           )}
           {!sound && (
-            <button onClick={toggleSound} className="rounded-full border-2 border-ink bg-ink px-3 py-1.5 text-xs font-bold uppercase text-gold hard-shadow">
+            <Button variant="ghost" onClick={toggleSound} className="rounded-full border-2 border-ink bg-ink px-3 py-1.5 text-xs font-bold uppercase text-gold hard-shadow">
               🔊 Tap for sound
-            </button>
+            </Button>
           )}
         </div>
       </div>
@@ -249,14 +263,14 @@ export function FlavourStage({ onDone }: { onDone?: () => void }) {
         {FLAVOURS.map((fl, i) => {
           const active = flavour === i && (pillShow || isStatic);
           return (
-            <button
+            <Button variant="ghost"
               key={fl.name}
               aria-pressed={active}
               onClick={() => pick(i)}
               className={`rounded-full border-2 border-ink px-3 py-1.5 text-xs font-bold uppercase transition-colors sm:text-sm ${active ? "bg-ink text-gold" : "bg-cream text-ink hover:bg-gold"}`}
             >
               {fl.name}
-            </button>
+            </Button>
           );
         })}
       </div>
