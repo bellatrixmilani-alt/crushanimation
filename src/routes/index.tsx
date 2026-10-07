@@ -36,7 +36,7 @@ function Index() {
         </nav>
       </header>
 
-      <section className="dots-bg">
+      <section className="dots-bg overflow-hidden">
         <div className="mx-auto grid max-w-6xl items-center gap-12 px-5 py-14 lg:grid-cols-2 lg:py-20">
           <div>
             <span className="inline-block bg-ink px-3 py-1 text-xs font-bold uppercase tracking-wider text-gold">🇰🇪 Made in Kenya · Loaded with flavour</span>

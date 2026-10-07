@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import mascotHold from "@/assets/potato-hold.webp";
+import mascotBody from "@/assets/potato-body.webp";
+import mascotTin from "@/assets/potato-tin.webp";
 import mascotPour from "@/assets/potato-pour.webp";
 import mascotCollect from "@/assets/potato-collect.webp";
 import bowlLogo from "@/assets/chipoz-logo.png.asset.json";
@@ -43,7 +44,7 @@ const fries = Array.from({ length: FRIES }, (_, i) => {
 type Mode = { kind: "auto" } | { kind: "static"; flavour: number; swapAt: number };
 
 export function FlavourStage({ onDone }: { onDone?: () => void }) {
-  const [t, setT] = useState(0);
+  const [t, setT] = useState(-COLLECT_DURATION);
   const [mode, setMode] = useState<Mode>({ kind: "auto" });
   const [now, setNow] = useState(0);
   const [sound, setSound] = useState(false);
@@ -101,7 +102,7 @@ export function FlavourStage({ onDone }: { onDone?: () => void }) {
   const restart = useCallback(() => {
     autoStart.current = elapsed.current;
     prevT.current = 0;
-    setT(0);
+    setT(-COLLECT_DURATION);
     setMode({ kind: "auto" });
   }, []);
 
@@ -143,7 +144,7 @@ export function FlavourStage({ onDone }: { onDone?: () => void }) {
   const f = FLAVOURS[flavour] ?? FLAVOURS[0];
   if (!f) return null;
 
-  // Mascot box (stage %): left 60, width 34, bottom 18.
+  // Mascot box (stage %): left 60, width 34, bottom 26.
   const bowl = {
     left: lerp(6, 20, glide),
     width: lerp(34, 60, glide),
@@ -162,9 +163,12 @@ export function FlavourStage({ onDone }: { onDone?: () => void }) {
         {leave < 1 && (
           <div
             className="absolute"
-            style={{ left: "60%", width: "34%", bottom: "26%", aspectRatio: "896 / 1200", transform: `translateX(${leave * 120}%) translateX(${shakeX}px) rotate(${shaking ? Math.sin(T * Math.PI * 24) * 3 : 0}deg)`, opacity: 1 - leave }}
+            style={{ left: "60%", width: "34%", bottom: "26%", aspectRatio: "896 / 1200", transform: `translateX(${leave * 120}%)`, opacity: 1 - leave }}
           >
-            <img src={collecting ? mascotCollect : pouring ? mascotPour : mascotHold} alt="" className="absolute inset-0 h-full w-full" draggable={false} />
+            <img src={collecting ? mascotCollect : pouring ? mascotPour : mascotBody} alt="" className="absolute inset-0 h-full w-full" draggable={false} />
+            {!collecting && !pouring && (
+              <img src={mascotTin} alt="" className="absolute inset-0 h-full w-full" draggable={false} style={{ transform: `translateX(${shakeX}px)` }} />
+            )}
             {shaking && (
               <div className="absolute" style={{ left: "15%", top: "56%", width: "70%", height: "20%" }}>
                 <ShakeFx t={T} />
@@ -199,7 +203,7 @@ export function FlavourStage({ onDone }: { onDone?: () => void }) {
             src={bowlLogo.url}
             alt=""
             draggable={false}
-            className="absolute left-[23%] top-[63%] w-[54%]"
+            className="absolute left-[32%] top-[59%] w-[36%]"
           />
           {(T >= 6.8 || isStatic) && sinceSwap >= 0 && sinceSwap < 0.7 && <SparkRing p={sinceSwap / 0.7} color={f.tint} />}
         </div>

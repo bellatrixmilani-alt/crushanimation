@@ -9,5 +9,5 @@
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
 
-- Keep the mascot poses as complete character-and-tin images in the existing timed animation; animate the combined pose to avoid duplicate tins and detached hands.
+- Keep the holding mascot body still and animate a separate transparent tin-and-gloves layer; use complete poses for powder collection and pouring.
 - Overlay the supplied bowl logo separately from the food image so flavour filters do not alter the branding.
