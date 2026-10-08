@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { FlavourStage, FLAVOURS } from "@/components/hero/FlavourStage";
+import { FLAVOURS } from "@/components/hero/FlavourStage";
+import { PourStage } from "@/components/hero/PourStage";
 import { track } from "@/lib/track";
 
 export const Route = createFileRoute("/")({
@@ -57,7 +58,7 @@ function Index() {
             <div className="absolute -inset-3 -rotate-3 rounded-[2rem] bg-frame sm:-inset-5" aria-hidden />
             <div className="relative rounded-[1.5rem] bg-ink p-[3px] shadow-[8px_10px_0_0_var(--ink)]">
               <div className="rounded-[1.4rem] bg-cream p-3">
-                <FlavourStage onDone={() => setPopKey((k) => k + 1)} />
+                <PourStage onDone={() => setPopKey((k) => k + 1)} />
               </div>
             </div>
           </div>
