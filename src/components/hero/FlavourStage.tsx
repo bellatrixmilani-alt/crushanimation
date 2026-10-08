@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import mascotBody from "@/assets/potato-body.webp";
+import mascotBody from "@/assets/potato-shake-real.webp";
 import mascotTin from "@/assets/potato-tin.webp";
-import mascotPour from "@/assets/potato-pour.webp";
-import mascotCollect from "@/assets/potato-collect.webp";
+import mascotPour from "@/assets/potato-pour-real.webp";
+import mascotCollect from "@/assets/potato-collect-real.webp";
+import realFry from "@/assets/real-fry.webp";
 import bowlLogo from "@/assets/chipoz-logo.png.asset.json";
 import { Button } from "@/components/ui/button";
-import bowlBbq from "@/assets/bowl-bbq.webp";
+import bowlBbq from "@/assets/bowl-pattern-real.webp";
 import { enableSound, sfx } from "./sound";
 import { track } from "@/lib/track";
 
@@ -33,11 +34,10 @@ const fries = Array.from({ length: FRIES }, (_, i) => {
   const r = (n: number) => ((Math.sin(i * 12.9898 + n * 78.233) * 43758.5453) % 1 + 1) % 1;
   return {
     start: 2.65 + (i / FRIES) * 1.4,
-    dur: 0.5 + r(1) * 0.25,
-    x1: 14 + r(2) * 18,
-    y1: 76 + r(3) * 4,
-    arc: 6 + r(4) * 10,
-    spin: (r(5) > 0.5 ? 1 : -1) * (300 + r(6) * 400),
+    dur: 0.3 + r(1) * 0.15,
+    x1: 29 + r(2) * 8,
+    y1: 78 + r(3) * 2,
+    spin: (r(5) > 0.5 ? 1 : -1) * (20 + r(6) * 45),
   };
 });
 
@@ -133,11 +133,12 @@ export function FlavourStage({ onDone }: { onDone?: () => void }) {
   const collecting = !isStatic && T < 0;
   const shaking = T >= 0.5 && T < 2.4;
   const pouring = T >= 2.5;
+  const approach = ease(prog(T, 1.8, 2.5));
   const shakeX = shaking ? Math.sin(T * Math.PI * 2 * 12) * 5 : 0;
   const leave = ease(prog(T, 5.2, 6.1));
   const glide = ease(prog(T, 5.2, 6.1));
   const fill = ease(prog(T, 2.65, 4.5));
-  const bowlIn = isStatic ? 1 : prog(T, 2.3, 2.6);
+  const bowlIn = 1;
   const popScale = sinceSwap >= 0 && sinceSwap < 0.25 ? lerp(1.12, 1, sinceSwap / 0.25) : 1;
   const pillShow = T >= 4.6;
   const pillScale = sinceSwap >= 0 && sinceSwap < 0.3 ? lerp(0.6, 1, ease(sinceSwap / 0.3)) : 1;
@@ -163,7 +164,7 @@ export function FlavourStage({ onDone }: { onDone?: () => void }) {
         {leave < 1 && (
           <div
             className="absolute"
-            style={{ left: "60%", width: "34%", bottom: "26%", aspectRatio: "896 / 1200", transform: `translateX(${leave * 120}%)`, opacity: 1 - leave }}
+            style={{ left: `${lerp(60, 32, approach)}%`, width: "34%", bottom: `${lerp(26, 14, approach)}%`, aspectRatio: "896 / 1200", transform: `translateX(${leave * 180}%)`, opacity: 1 - leave }}
           >
             <img src={collecting ? mascotCollect : pouring ? mascotPour : mascotBody} alt="" className="absolute inset-0 h-full w-full" draggable={false} />
             {!collecting && !pouring && (
@@ -197,13 +198,20 @@ export function FlavourStage({ onDone }: { onDone?: () => void }) {
             alt=""
             className="w-full"
             draggable={false}
-            style={{ filter: f.bowl ? "none" : f.hue, clipPath: `inset(${lerp(48, 0, isStatic ? 1 : fill)}% 0 0 0)` }}
+            style={{ clipPath: "inset(58% 0 0 0)" }}
+          />
+          <img
+            src={bowlBbq}
+            alt=""
+            draggable={false}
+            className="absolute inset-0 w-full"
+            style={{ filter: f.bowl ? "none" : f.hue, clipPath: `inset(${lerp(58, 0, isStatic ? 1 : fill)}% 0 42% 0)` }}
           />
           <img
             src={bowlLogo.url}
             alt=""
             draggable={false}
-            className="absolute left-[32%] top-[59%] w-[36%]"
+            className="absolute left-[32%] top-[65%] w-[36%]"
           />
           {(T >= 6.8 || isStatic) && sinceSwap >= 0 && sinceSwap < 0.7 && <SparkRing p={sinceSwap / 0.7} color={f.tint} />}
         </div>
@@ -213,13 +221,16 @@ export function FlavourStage({ onDone }: { onDone?: () => void }) {
           fries.map((fr, i) => {
             const p = (T - fr.start) / fr.dur;
             if (p < 0 || p > 1) return null;
-            const x = lerp(63, fr.x1, p);
-            const y = lerp(61, fr.y1, p * p) - fr.arc * 4 * p * (1 - p) * 0.5;
+            const x = lerp(35.4, fr.x1, p);
+            const y = lerp(73, fr.y1, p * p);
             return (
-              <span
+              <img
                 key={i}
-                className="absolute rounded-[2px] border border-fry-edge bg-fry"
-                style={{ left: `${x}%`, top: `${y}%`, width: "1.2%", height: "5%", transform: `rotate(${p * fr.spin}deg)` }}
+                src={realFry}
+                alt=""
+                draggable={false}
+                className="pointer-events-none absolute"
+                style={{ left: `${x}%`, top: `${y}%`, width: "5%", transform: `translate(-50%, -50%) rotate(${65 + p * fr.spin}deg)` }}
               />
             );
           })}
