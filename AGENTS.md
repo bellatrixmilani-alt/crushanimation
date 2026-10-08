@@ -11,3 +11,4 @@
 
 - Keep the holding mascot body still and animate a separate transparent tin-and-gloves layer; use complete poses for powder collection and pouring.
 - Overlay the supplied bowl logo separately from the food image so flavour filters do not alter the branding.
+- Use FlavourStage for the homepage collect–shake–approach–pour sequence; keep photographic falling fries and an unfiltered bowl shell separate from the flavour-tinted food layer so branding stays intact.
