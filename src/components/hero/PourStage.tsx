@@ -10,7 +10,7 @@ const RIM = 64;
 const POUR_END = 5.2;
 const END = 6.2;
 const N = 44;
-const SRC = { x: 30, y: 30 }; // mascot's container mouth
+const SRC = { x: 9, y: 34 }; // mascot's container mouth
 const clamp = (p: number) => Math.max(0, Math.min(1, p));
 const ease = (p: number) => 1 - Math.pow(1 - p, 3);
 
@@ -123,7 +123,7 @@ export function PourStage({ onDone }: { onDone?: () => void }) {
           <div className="bowl-shadow absolute -bottom-[6%] left-[8%] h-[14%] w-[84%] rounded-[50%]" />
           <div className="bowl-body absolute inset-0 overflow-hidden" style={{ clipPath: "polygon(0 0, 100% 0, 92% 100%, 8% 100%)" }}>
             <div className="bowl-panel absolute inset-y-0 right-0 w-[24%]">
-              <p className="absolute left-[8%] top-[22%] w-[90%] -rotate-12 font-display text-[2.1cqw] uppercase leading-tight text-bowl-yellow">The best flavoured fries in town</p>
+              <p className="absolute left-[8%] top-[22%] w-[90%] -rotate-12 font-display text-[1.8cqw] uppercase leading-tight text-bowl-yellow">The best flavoured fries in town</p>
             </div>
             <img src={bowlLogo.url} alt="" draggable={false} className="absolute left-[24%] top-[14%] w-[44%]" />
           </div>
