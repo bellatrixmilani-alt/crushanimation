@@ -36,6 +36,8 @@
   --color-frame: var(--frame);
   --color-fry: var(--fry);
   --color-fry-edge: var(--fry-edge);
+  --color-bowl-yellow: var(--bowl-yellow);
+  --color-bowl-maroon: var(--bowl-maroon);
 }
 
 :root {
@@ -65,6 +67,8 @@
   --frame: oklch(0.52 0.2 25);
   --fry: oklch(0.85 0.15 85);
   --fry-edge: oklch(0.6 0.14 60);
+  --bowl-yellow: #F9B91F;
+  --bowl-maroon: #7A1020;
   /* Flavour stage tints */
   --tint-bbq: #ffa640;
   --tint-cheese: #ffbe28;
@@ -103,3 +107,10 @@
 @media (prefers-reduced-motion: reduce) {
   .marquee, .word-pop { animation: none; }
 }
+
+.pour-scene { background: linear-gradient(var(--cream), oklch(0.93 0.04 90)); }
+.marble { background: linear-gradient(170deg, oklch(0.97 0 0), oklch(0.9 0.005 250)), oklch(0.95 0 0); background-blend-mode: multiply; }
+.bowl-body { background-color: var(--bowl-yellow); background-image: repeating-linear-gradient(45deg, oklch(1 0 0 / 0.12) 0 2px, transparent 2px 12px), repeating-linear-gradient(-45deg, oklch(0.6 0.15 60 / 0.15) 0 2px, transparent 2px 12px); }
+.bowl-panel { background-color: var(--bowl-maroon); background-image: repeating-linear-gradient(60deg, oklch(1 0 0 / 0.07) 0 2px, transparent 2px 10px); }
+.bowl-shadow { background: oklch(0.2 0.01 60 / 0.25); filter: blur(6px); }
+.real-fry { background: radial-gradient(circle at 30% 30%, oklch(0.45 0.15 30 / 0.6) 1px, transparent 1.5px) 0 0 / 4px 4px, linear-gradient(90deg, oklch(0.62 0.17 45), oklch(0.72 0.16 60), oklch(0.6 0.17 40)); }
