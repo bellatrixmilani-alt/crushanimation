@@ -6,3 +6,4 @@
 - [x] Hero pour scene: mascot pours cartoon fries from above into CSS bowl; fries turn real at rim; Pour again button.
 - [ ] Restore previous flavour animation with real fries, spoon collection, close pouring, shaking expression and hat-pattern bowl.
 - [ ] Verify the restored animation and controls.
+- [ ] Match the uploaded bowl reference: reposition the logo and remove the white bottom edge.
