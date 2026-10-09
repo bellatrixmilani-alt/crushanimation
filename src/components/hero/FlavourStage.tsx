@@ -211,7 +211,7 @@ export function FlavourStage({ onDone }: { onDone?: () => void }) {
             src={bowlLogo.url}
             alt=""
             draggable={false}
-            className="absolute left-[32%] top-[65%] w-[36%]"
+            className="absolute left-[34%] top-[63%] w-[32%]"
           />
           {(T >= 6.8 || isStatic) && sinceSwap >= 0 && sinceSwap < 0.7 && <SparkRing p={sinceSwap / 0.7} color={f.tint} />}
         </div>
