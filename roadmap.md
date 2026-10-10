@@ -1,4 +1,7 @@
 # Tasks
+- [ ] Match the homepage colours to the supplied reference.
+- [ ] Start animation on desktop opening or tablet/phone scroll into view; repeat only through Replay.
+- [ ] Restore the empty bowl's complete white rim and verify playback.
 - [x] Replace animation character and shaking tin with supplied references.
 - [x] Add a powder-collecting pose before shaking.
 - [x] Brand the fries bowl with the supplied Chipoz logo.
