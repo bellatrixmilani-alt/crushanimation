@@ -31,7 +31,7 @@ export const fries = Array.from({ length: FRY_COUNT }, (_, i) => {
   const gravity = 180;
   const velocityY = 10;
   const dur = (Math.sqrt(velocityY ** 2 + 2 * gravity * (targetY - source.y)) - velocityY) / gravity;
-  return { start, dur, source, targetY, targetX: source.x - 1.2 - random(2) * 3.2, spin: (random(3) - 0.5) * 75, size: 2.8 + random(4) * 0.7 };
+  return { start, dur, source, targetY, targetX: source.x - 1.2 - random(2) * 3.2, spin: (random(3) - 0.5) * 75, size: 4.2 + random(4) * 0.8 };
 });
 
 // Each landing contributes smoothly, never filling before the first fry arrives.

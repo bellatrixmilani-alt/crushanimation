@@ -143,7 +143,7 @@ export function FlavourStage({ onDone }: { onDone?: () => void }) {
   const isStatic = mode.kind === "static";
   const T = isStatic ? END + 1 : t;
   let flavour = 0;
-  let swapT = 5.5;
+  let swapT = 6.7;
   if (isStatic) { flavour = mode.flavour; swapT = -100; }
   else SWAPS.forEach((s, i) => { if (T >= s) { flavour = i + 1; swapT = s; } });
   const sinceSwap = isStatic ? now - mode.swapAt : T - swapT;
@@ -159,7 +159,7 @@ export function FlavourStage({ onDone }: { onDone?: () => void }) {
   const fill = isStatic ? 1 : fillAt(T);
   const bowlIn = 1;
   const popScale = sinceSwap >= 0 && sinceSwap < 0.25 ? lerp(1.12, 1, sinceSwap / 0.25) : 1;
-  const pillShow = T >= 5.5;
+  const pillShow = T >= 6.7;
   const pillScale = sinceSwap >= 0 && sinceSwap < 0.3 ? lerp(0.6, 1, ease(sinceSwap / 0.3)) : 1;
   const f = FLAVOURS[flavour] ?? FLAVOURS[0];
   if (!f) return null;
@@ -216,7 +216,7 @@ export function FlavourStage({ onDone }: { onDone?: () => void }) {
             className="w-full"
             draggable={false}
           />
-          <div className="absolute inset-0 z-[2] overflow-hidden" style={{ clipPath: "inset(0 0 42% 0)" }}><img
+          <div className="absolute inset-0 z-[2] overflow-hidden" style={{ clipPath: `inset(0 ${lerp(14, 0, fill)}% 42% ${lerp(14, 0, fill)}%)` }}><img
             src={bowlBbq}
             alt=""
             draggable={false}
