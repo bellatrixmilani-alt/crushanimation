@@ -70,14 +70,27 @@ export function FlavourStage({ onDone }: { onDone?: () => void }) {
     }
     const stage = stageRef.current;
     if (!stage) return;
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry?.isIntersecting && entry.intersectionRatio >= 0.35) {
+    let hasScrolled = window.scrollY > 0;
+    const startIfVisible = () => {
+      const rect = stage.getBoundingClientRect();
+      const visibleHeight = Math.max(0, Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0));
+      if (hasScrolled && visibleHeight >= rect.height * 0.35) {
         setStarted(true);
         observer.disconnect();
+        window.removeEventListener("scroll", onScroll);
       }
-    }, { threshold: 0.35 });
+    };
+    const onScroll = () => {
+      hasScrolled = true;
+      startIfVisible();
+    };
+    const observer = new IntersectionObserver(startIfVisible, { threshold: 0.35 });
     observer.observe(stage);
-    return () => observer.disconnect();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("scroll", onScroll);
+    };
   }, []);
 
   // Clock: advances only while tab is visible (rAF pauses when hidden; delta clamped).
