@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import mascotBody from "@/assets/potato-shake-real.webp";
 import mascotTin from "@/assets/potato-tin.webp";
-import mascotPour from "@/assets/potato-pour-real.webp";
+import pourBody from "@/assets/pour-still-body.webp";
+import pourTin from "@/assets/pour-tin-gloves.webp";
 import mascotCollect from "@/assets/potato-collect-real.webp";
 import realFry from "@/assets/real-fry.webp";
 import bowlLogo from "@/assets/chipoz-logo.png.asset.json";
@@ -10,6 +11,7 @@ import bowlBbq from "@/assets/bowl-pattern-real.webp";
 import bowlEmpty from "@/assets/bowl-empty.png";
 import { enableSound, sfx } from "./sound";
 import { track } from "@/lib/track";
+import { ease, lerp, prog, fries, fillAt, fryAt, tinAngle, POUR_START } from "./pour-motion";
 
 type Flavour = { name: string; tint: string; bowl?: string; hue: string };
 // Bowls without their own photo fall back to the Chilly BBQ bowl with a CSS tint.
@@ -21,26 +23,9 @@ export const FLAVOURS: Flavour[] = [
   { name: "Chilly Lemon", tint: "var(--tint-lemon)", hue: "hue-rotate(8deg) saturate(0.7) brightness(1.2)" },
 ];
 
-const SWAPS = [6.8, 8.1, 9.4, 10.7]; // flavours 1..4
-const END = 12;
+const SWAPS = [7.4, 8.7, 10, 11.3]; // flavours 1..4
+const END = 12.6;
 const COLLECT_DURATION = 1.4;
-const FRIES = 38;
-const lerp = (a: number, b: number, p: number) => a + (b - a) * p;
-const clamp = (p: number) => Math.max(0, Math.min(1, p));
-const ease = (p: number) => (p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2);
-const prog = (t: number, a: number, b: number) => clamp((t - a) / (b - a));
-
-// Pre-computed fry paths (stage % coords)
-const fries = Array.from({ length: FRIES }, (_, i) => {
-  const r = (n: number) => ((Math.sin(i * 12.9898 + n * 78.233) * 43758.5453) % 1 + 1) % 1;
-  return {
-    start: 2.65 + (i / FRIES) * 1.4,
-    dur: 0.3 + r(1) * 0.15,
-    x1: 29 + r(2) * 8,
-    y1: 78 + r(3) * 2,
-    spin: (r(5) > 0.5 ? 1 : -1) * (20 + r(6) * 45),
-  };
-});
 
 type Mode = { kind: "auto" } | { kind: "static"; flavour: number; swapAt: number };
 
@@ -123,10 +108,10 @@ export function FlavourStage({ onDone }: { onDone?: () => void }) {
       const crossed = (x: number) => p < x && nt >= x;
       if (nt > 0.5 && nt < 2.4 && Math.floor(nt * 12) !== Math.floor(p * 12)) sfx.rattle();
       if (crossed(2.5)) sfx.lid();
-      if (crossed(2.65)) sfx.pour();
+      if (crossed(POUR_START)) sfx.pour();
       fries.forEach((f) => crossed(f.start + f.dur) && sfx.click());
-      if (crossed(5.2)) sfx.swoosh();
-      [4.6, ...SWAPS].forEach((x) => { if (crossed(x)) { sfx.pop(); [0.05, 0.12, 0.2].forEach((d) => setTimeout(sfx.tick, d * 1000)); } });
+      if (crossed(5.8)) sfx.swoosh();
+      [6.7, ...SWAPS].forEach((x) => { if (crossed(x)) { sfx.pop(); [0.05, 0.12, 0.2].forEach((d) => setTimeout(sfx.tick, d * 1000)); } });
     }
     if (p < END && nt >= END) doneRef.current?.();
     prevT.current = nt;
@@ -158,23 +143,23 @@ export function FlavourStage({ onDone }: { onDone?: () => void }) {
   const isStatic = mode.kind === "static";
   const T = isStatic ? END + 1 : t;
   let flavour = 0;
-  let swapT = 4.6;
+  let swapT = 6.7;
   if (isStatic) { flavour = mode.flavour; swapT = -100; }
   else SWAPS.forEach((s, i) => { if (T >= s) { flavour = i + 1; swapT = s; } });
   const sinceSwap = isStatic ? now - mode.swapAt : T - swapT;
   const done = isStatic || T >= END;
 
   const collecting = !isStatic && T < 0;
-  const shaking = T >= 0.5 && T < 2.4;
+  const shaking = T >= 0.5 && T < 1.8;
   const pouring = T >= 2.5;
   const approach = ease(prog(T, 1.8, 2.5));
   const shakeX = shaking ? Math.sin(T * Math.PI * 2 * 12) * 5 : 0;
-  const leave = ease(prog(T, 5.2, 6.1));
-  const glide = ease(prog(T, 5.2, 6.1));
-  const fill = ease(prog(T, 2.65, 4.5));
+  const leave = ease(prog(T, 5.8, 6.7));
+  const glide = ease(prog(T, 5.8, 6.7));
+  const fill = isStatic ? 1 : fillAt(T);
   const bowlIn = 1;
   const popScale = sinceSwap >= 0 && sinceSwap < 0.25 ? lerp(1.12, 1, sinceSwap / 0.25) : 1;
-  const pillShow = T >= 4.6;
+  const pillShow = T >= 6.7;
   const pillScale = sinceSwap >= 0 && sinceSwap < 0.3 ? lerp(0.6, 1, ease(sinceSwap / 0.3)) : 1;
   const f = FLAVOURS[flavour] ?? FLAVOURS[0];
   if (!f) return null;
@@ -192,6 +177,7 @@ export function FlavourStage({ onDone }: { onDone?: () => void }) {
         ref={stageRef}
         data-playback={done ? "finished" : started ? "playing" : "waiting"}
         data-phase={done ? "finished" : collecting ? "collect" : pouring ? "pour" : "shake"}
+        data-fill={fill.toFixed(3)}
         className="relative w-full overflow-hidden rounded-[1.25rem] border-[3px] border-ink"
         style={{ aspectRatio: "5 / 4", background: f.tint, transition: "background-color 200ms linear", containerType: "inline-size" }}
         aria-label={`Chipoz animation showing ${f.name}`}
@@ -201,9 +187,13 @@ export function FlavourStage({ onDone }: { onDone?: () => void }) {
         {leave < 1 && (
           <div
             className="absolute"
-            style={{ left: `${lerp(60, 32, approach)}%`, width: "34%", bottom: `${lerp(26, 14, approach)}%`, aspectRatio: "896 / 1200", transform: `translateX(${leave * 180}%)`, opacity: 1 - leave }}
+            style={{ left: `${lerp(60, 21, approach)}%`, width: "34%", bottom: `${lerp(26, 38, approach)}%`, aspectRatio: "896 / 1200", transform: `translateX(${leave * 180}%)`, opacity: 1 - leave }}
           >
-            <img src={collecting ? mascotCollect : pouring ? mascotPour : mascotBody} alt="" className="absolute inset-0 h-full w-full" draggable={false} />
+            <img src={collecting ? mascotCollect : mascotBody} alt="" className="absolute inset-0 h-full w-full" draggable={false} style={{ opacity: 1 - ease(prog(T, 2.5, 2.7)) }} />
+            {pouring && <>
+              <img src={pourBody} alt="" className="absolute inset-0 h-full w-full" draggable={false} style={{ opacity: ease(prog(T, 2.5, 2.7)) }} />
+              <img src={pourTin} alt="" className="absolute inset-0 h-full w-full" draggable={false} style={{ opacity: ease(prog(T, 2.5, 2.7)), transformOrigin: "64% 60%", transform: `rotate(${tinAngle(T)}deg)` }} />
+            </>}
             {!collecting && !pouring && (
               <img src={mascotTin} alt="" className="absolute inset-0 h-full w-full" draggable={false} style={{ transform: `translateX(${shakeX}px)` }} />
             )}
@@ -211,16 +201,6 @@ export function FlavourStage({ onDone }: { onDone?: () => void }) {
               <div className="absolute" style={{ left: "15%", top: "56%", width: "70%", height: "20%" }}>
                 <ShakeFx t={T} />
               </div>
-            )}
-            {/* Lid popping off */}
-            {pouring && T < 3.3 && (
-              <div
-                className="absolute rounded-full border-2 border-ink bg-muted-foreground"
-                style={{
-                  left: "12%", top: "77%", width: "6%", aspectRatio: "1 / 2.4",
-                  transform: `translate(${-prog(T, 2.5, 3.3) * 120}cqw, ${(-30 * prog(T, 2.5, 3.3) + 140 * prog(T, 2.5, 3.3) ** 2) * 1}%) rotate(${prog(T, 2.5, 3.3) * -540}deg)`,
-                }}
-              />
             )}
           </div>
         )}
@@ -236,37 +216,37 @@ export function FlavourStage({ onDone }: { onDone?: () => void }) {
             className="w-full"
             draggable={false}
           />
-          <img
+          <div className="absolute inset-0 z-[2] overflow-hidden" style={{ clipPath: `inset(0 ${lerp(14, 0, fill)}% 42% ${lerp(14, 0, fill)}%)` }}><img
             src={bowlBbq}
             alt=""
             draggable={false}
             className="absolute inset-0 w-full"
-            style={{ filter: f.bowl ? "none" : f.hue, clipPath: `inset(${lerp(58, 0, isStatic ? 1 : fill)}% 0 42% 0)`, opacity: isStatic || fill > 0 ? 1 : 0 }}
-          />
+            style={{ filter: f.bowl ? "none" : f.hue, clipPath: "inset(0 0 44% 0)", transform: `translateY(${lerp(58, 0, fill)}%)`, opacity: Math.min(1, fill * 12) }}
+          /></div>
+          <img src={bowlEmpty} alt="" draggable={false} className="pointer-events-none absolute inset-0 z-[4] w-full" style={{ clipPath: "inset(58% 0 0 0)" }} />
           <img
             src={bowlLogo.url}
             alt=""
             draggable={false}
-            className="absolute left-[34%] top-[63%] w-[32%]"
+            className="absolute left-[34%] top-[63%] z-[5] w-[32%]"
           />
           {(T >= 6.8 || isStatic) && sinceSwap >= 0 && sinceSwap < 0.7 && <SparkRing p={sinceSwap / 0.7} color={f.tint} />}
         </div>
 
         {/* Falling fries */}
-        {!isStatic && T > 2.6 && T < 4.6 &&
+        {!isStatic &&
           fries.map((fr, i) => {
-            const p = (T - fr.start) / fr.dur;
-            if (p < 0 || p > 1) return null;
-            const x = lerp(35.4, fr.x1, p);
-            const y = lerp(73, fr.y1, p * p);
+            const position = fryAt(T, fr);
+            if (!position) return null;
             return (
               <img
                 key={i}
                 src={realFry}
                 alt=""
                 draggable={false}
-                className="pointer-events-none absolute"
-                style={{ left: `${x}%`, top: `${y}%`, width: "5%", transform: `translate(-50%, -50%) rotate(${65 + p * fr.spin}deg)` }}
+                className="pointer-events-none absolute z-[3]"
+                data-falling-fry=""
+                style={{ left: `${position.x}%`, top: `${position.y}%`, width: `${fr.size}%`, transform: `translate(-50%, -50%) rotate(${position.rotation}deg)` }}
               />
             );
           })}
