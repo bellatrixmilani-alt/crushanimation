@@ -7,6 +7,7 @@ import realFry from "@/assets/real-fry.webp";
 import bowlLogo from "@/assets/chipoz-logo.png.asset.json";
 import { Button } from "@/components/ui/button";
 import bowlBbq from "@/assets/bowl-pattern-real.webp";
+import bowlEmpty from "@/assets/bowl-empty.png";
 import { enableSound, sfx } from "./sound";
 import { track } from "@/lib/track";
 
@@ -48,42 +49,75 @@ export function FlavourStage({ onDone }: { onDone?: () => void }) {
   const [mode, setMode] = useState<Mode>({ kind: "auto" });
   const [now, setNow] = useState(0);
   const [sound, setSound] = useState(false);
+  const [started, setStarted] = useState(false);
+  const [playbackKey, setPlaybackKey] = useState(0);
+  const stageRef = useRef<HTMLDivElement>(null);
   const elapsed = useRef(0);
   const prevT = useRef(0);
   const soundRef = useRef(false);
   const doneRef = useRef(onDone);
   doneRef.current = onDone;
 
-  // Reduced motion: jump straight to the centred bowl.
+  // Desktop starts on entry; smaller screens wait for the stage to be visible.
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       setMode({ kind: "static", flavour: 0, swapAt: -10 });
+      return;
     }
+    if (window.matchMedia("(min-width: 1024px) and (pointer: fine)").matches) {
+      setStarted(true);
+      return;
+    }
+    const stage = stageRef.current;
+    if (!stage) return;
+    let hasScrolled = window.scrollY > 0;
+    const startIfVisible = () => {
+      const rect = stage.getBoundingClientRect();
+      const visibleHeight = Math.max(0, Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0));
+      if (hasScrolled && visibleHeight >= rect.height * 0.35) {
+        setStarted(true);
+        observer.disconnect();
+        window.removeEventListener("scroll", onScroll);
+      }
+    };
+    const onScroll = () => {
+      hasScrolled = true;
+      startIfVisible();
+    };
+    const observer = new IntersectionObserver(startIfVisible, { threshold: 0.35 });
+    observer.observe(stage);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("scroll", onScroll);
+    };
   }, []);
 
   // Clock: advances only while tab is visible (rAF pauses when hidden; delta clamped).
   useEffect(() => {
+    if (!started) return;
     let raf = 0;
     let last = performance.now();
+    const stopAt = mode.kind === "auto" ? autoStart.current + COLLECT_DURATION + END : mode.swapAt + 0.8;
     const loop = (ts: number) => {
       const dt = Math.min(0.05, (ts - last) / 1000);
       last = ts;
       if (!document.hidden) {
-        elapsed.current += dt;
+        elapsed.current = Math.min(stopAt, elapsed.current + dt);
         setNow(elapsed.current);
       }
-      raf = requestAnimationFrame(loop);
+      if (elapsed.current < stopAt) raf = requestAnimationFrame(loop);
     };
     const onVis = () => { last = performance.now(); };
     document.addEventListener("visibilitychange", onVis);
     raf = requestAnimationFrame(loop);
     return () => { cancelAnimationFrame(raf); document.removeEventListener("visibilitychange", onVis); };
-  }, []);
+  }, [started, mode, playbackKey]);
 
   const autoStart = useRef(0);
   useEffect(() => {
-    if (mode.kind !== "auto") return;
-    const nt = Math.min(END + 1, now - autoStart.current - COLLECT_DURATION);
+    if (mode.kind !== "auto" || !started) return;
+    const nt = Math.min(END, now - autoStart.current - COLLECT_DURATION);
     const p = prevT.current;
     if (soundRef.current) {
       const crossed = (x: number) => p < x && nt >= x;
@@ -97,18 +131,19 @@ export function FlavourStage({ onDone }: { onDone?: () => void }) {
     if (p < END && nt >= END) doneRef.current?.();
     prevT.current = nt;
     setT(nt);
-  }, [now, mode.kind]);
+  }, [now, mode.kind, started]);
 
   const restart = useCallback(() => {
     autoStart.current = elapsed.current;
-    prevT.current = 0;
+    prevT.current = -COLLECT_DURATION;
     setT(-COLLECT_DURATION);
     setMode({ kind: "auto" });
+    setStarted(true);
+    setPlaybackKey((key) => key + 1);
   }, []);
 
   const pick = (i: number) => {
     track("flavour_chip_click", { flavour: FLAVOURS[i]?.name });
-    if (i === 0) return restart();
     setMode({ kind: "static", flavour: i, swapAt: elapsed.current });
     if (soundRef.current) { sfx.pop(); setTimeout(sfx.tick, 80); }
   };
@@ -117,7 +152,6 @@ export function FlavourStage({ onDone }: { onDone?: () => void }) {
     enableSound();
     soundRef.current = true;
     setSound(true);
-    restart();
   };
 
   // ---- Derived scene state ----
@@ -155,6 +189,9 @@ export function FlavourStage({ onDone }: { onDone?: () => void }) {
   return (
     <div className="w-full">
       <div
+        ref={stageRef}
+        data-playback={done ? "finished" : started ? "playing" : "waiting"}
+        data-phase={done ? "finished" : collecting ? "collect" : pouring ? "pour" : "shake"}
         className="relative w-full overflow-hidden rounded-[1.25rem] border-[3px] border-ink"
         style={{ aspectRatio: "5 / 4", background: f.tint, transition: "background-color 200ms linear", containerType: "inline-size" }}
         aria-label={`Chipoz animation showing ${f.name}`}
@@ -194,18 +231,17 @@ export function FlavourStage({ onDone }: { onDone?: () => void }) {
           style={{ left: `${bowl.left}%`, width: `${bowl.width}%`, bottom: `${bowl.bottom}%`, opacity: bowlIn, transform: `scale(${done || T >= 6.8 ? popScale : 1})`, transformOrigin: "50% 80%" }}
         >
           <img
-            src={f.bowl ?? bowlBbq}
+            src={bowlEmpty}
             alt=""
             className="w-full"
             draggable={false}
-            style={{ clipPath: "inset(58% 0 0 0)" }}
           />
           <img
             src={bowlBbq}
             alt=""
             draggable={false}
             className="absolute inset-0 w-full"
-            style={{ filter: f.bowl ? "none" : f.hue, clipPath: `inset(${lerp(58, 0, isStatic ? 1 : fill)}% 0 42% 0)` }}
+            style={{ filter: f.bowl ? "none" : f.hue, clipPath: `inset(${lerp(58, 0, isStatic ? 1 : fill)}% 0 42% 0)`, opacity: isStatic || fill > 0 ? 1 : 0 }}
           />
           <img
             src={bowlLogo.url}

@@ -42,13 +42,13 @@
 
 :root {
   --radius: 1rem;
-  --background: oklch(0.89 0.18 95);
-  --foreground: oklch(0.2 0.01 60);
+  --background: #ffa800;
+  --foreground: #290d00;
   --card: oklch(0.98 0.02 95);
   --card-foreground: oklch(0.2 0.01 60);
   --popover: oklch(0.98 0.02 95);
   --popover-foreground: oklch(0.2 0.01 60);
-  --primary: oklch(0.56 0.22 27);
+  --primary: #b31c0d;
   --primary-foreground: oklch(0.99 0 0);
   --secondary: oklch(0.98 0.03 95);
   --secondary-foreground: oklch(0.2 0.01 60);
@@ -61,10 +61,10 @@
   --border: oklch(0.2 0.01 60);
   --input: oklch(0.2 0.01 60);
   --ring: oklch(0.56 0.22 27);
-  --ink: oklch(0.2 0.01 60);
-  --gold: oklch(0.86 0.17 90);
+  --ink: #290d00;
+  --gold: #ffa800;
   --cream: oklch(0.98 0.03 95);
-  --frame: oklch(0.52 0.2 25);
+  --frame: #b31c0d;
   --fry: oklch(0.85 0.15 85);
   --fry-edge: oklch(0.6 0.14 60);
   --bowl-yellow: #F9B91F;
