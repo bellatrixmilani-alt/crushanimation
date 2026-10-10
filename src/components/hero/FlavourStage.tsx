@@ -111,7 +111,7 @@ export function FlavourStage({ onDone }: { onDone?: () => void }) {
       if (crossed(POUR_START)) sfx.pour();
       fries.forEach((f) => crossed(f.start + f.dur) && sfx.click());
       if (crossed(5.8)) sfx.swoosh();
-      [5.5, ...SWAPS].forEach((x) => { if (crossed(x)) { sfx.pop(); [0.05, 0.12, 0.2].forEach((d) => setTimeout(sfx.tick, d * 1000)); } });
+      [6.7, ...SWAPS].forEach((x) => { if (crossed(x)) { sfx.pop(); [0.05, 0.12, 0.2].forEach((d) => setTimeout(sfx.tick, d * 1000)); } });
     }
     if (p < END && nt >= END) doneRef.current?.();
     prevT.current = nt;
