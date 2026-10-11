@@ -1,4 +1,7 @@
 # Tasks
+- [ ] Keep the bowl fixed and accumulate landed fries naturally inside it.
+- [ ] Improve and verify pouring sound, respecting browser sound permission.
+- [ ] Verify the updated pour on desktop and mobile.
 - [x] Refine the connected tin pour, gravity-driven fries and synchronised rising pile.
 - [x] Verify the refined pour and Replay on desktop and phone.
 - [x] Match the homepage colours to the supplied reference.
