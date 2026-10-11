@@ -55,20 +55,16 @@ export function FlavourStage({ onDone }: { onDone?: () => void }) {
     }
     const stage = stageRef.current;
     if (!stage) return;
-    let hasScrolled = window.scrollY > 0;
     const startIfVisible = () => {
       const rect = stage.getBoundingClientRect();
       const visibleHeight = Math.max(0, Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0));
-      if (hasScrolled && visibleHeight >= rect.height * 0.35) {
+      if (visibleHeight >= rect.height * 0.3) {
         setStarted(true);
         observer.disconnect();
         window.removeEventListener("scroll", onScroll);
       }
     };
-    const onScroll = () => {
-      hasScrolled = true;
-      startIfVisible();
-    };
+    const onScroll = () => startIfVisible();
     const observer = new IntersectionObserver(startIfVisible, { threshold: 0.35 });
     observer.observe(stage);
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -189,11 +185,10 @@ export function FlavourStage({ onDone }: { onDone?: () => void }) {
             className="absolute"
             style={{ left: `${lerp(60, 21, approach)}%`, width: "34%", bottom: `${lerp(26, 38, approach)}%`, aspectRatio: "896 / 1200", transform: `translateX(${leave * 180}%)`, opacity: 1 - leave }}
           >
-            <img src={collecting ? mascotCollect : mascotBody} alt="" className="absolute inset-0 h-full w-full" draggable={false} style={{ opacity: 1 - ease(prog(T, 2.5, 2.7)) }} />
-            {pouring && <>
-              <img src={pourBody} alt="" className="absolute inset-0 h-full w-full" draggable={false} style={{ opacity: ease(prog(T, 2.5, 2.7)) }} />
-              <img src={pourTin} alt="" className="absolute inset-0 h-full w-full" draggable={false} style={{ opacity: ease(prog(T, 2.5, 2.7)), transformOrigin: "64% 60%", transform: `rotate(${tinAngle(T)}deg)` }} />
-            </>}
+            {!pouring && <img src={collecting ? mascotCollect : mascotBody} alt="" className="absolute inset-0 h-full w-full" draggable={false} />}
+            {/* Pour layers are always mounted (preloaded) and swap in instantly — no see-through fade. */}
+            <img src={pourBody} alt="" className="absolute inset-0 h-full w-full" draggable={false} style={{ opacity: pouring ? 1 : 0 }} />
+            <img src={pourTin} alt="" className="absolute inset-0 h-full w-full" draggable={false} style={{ opacity: pouring ? 1 : 0, transformOrigin: "64% 60%", transform: `rotate(${tinAngle(T)}deg)` }} />
             {!collecting && !pouring && (
               <img src={mascotTin} alt="" className="absolute inset-0 h-full w-full" draggable={false} style={{ transform: `translateX(${shakeX}px)` }} />
             )}
