@@ -49,7 +49,7 @@ export function FlavourStage({ onDone }: { onDone?: () => void }) {
       setMode({ kind: "static", flavour: 0, swapAt: -10 });
       return;
     }
-    if (window.matchMedia("(min-width: 1024px) and (pointer: fine)").matches) {
+    if (window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
       setStarted(true);
       return;
     }

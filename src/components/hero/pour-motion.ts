@@ -1,6 +1,6 @@
 export const POUR_START = 2.95;
-export const POUR_END = 4.8;
-export const FRY_COUNT = 48;
+export const POUR_END = 4.5;
+export const FRY_COUNT = 16;
 export const clamp = (value: number) => Math.max(0, Math.min(1, value));
 export const lerp = (a: number, b: number, p: number) => a + (b - a) * p;
 export const ease = (p: number) => p < 0.5 ? 2 * p * p : 1 - (-2 * p + 2) ** 2 / 2;
@@ -28,20 +28,20 @@ export const fries = Array.from({ length: FRY_COUNT }, (_, i) => {
   const start = POUR_START + (i / (FRY_COUNT - 1)) * (POUR_END - POUR_START);
   const source = mouthAt(start);
   const targetY = lerp(76, 56, i / (FRY_COUNT - 1));
-  const gravity = 180;
-  const velocityY = 10;
+  const gravity = 70;
+  const velocityY = 4;
   const dur = (Math.sqrt(velocityY ** 2 + 2 * gravity * (targetY - source.y)) - velocityY) / gravity;
-  return { start, dur, source, targetY, targetX: source.x - 1.2 - random(2) * 3.2, spin: (random(3) - 0.5) * 75, size: 4.2 + random(4) * 0.8 };
+  return { start, dur, source, targetY, targetX: source.x - 2 - random(2) * 7, spin: (random(3) - 0.5) * 220, size: 9 + random(4) * 3 };
 });
 
 // Each landing contributes smoothly, never filling before the first fry arrives.
 export function fillAt(t: number) {
-  return fries.reduce((sum, fry) => sum + ease(prog(t, fry.start + fry.dur, fry.start + fry.dur + 0.16)), 0) / FRY_COUNT;
+  return fries.reduce((sum, fry) => sum + ease(prog(t, fry.start + fry.dur, fry.start + fry.dur + 0.3)), 0) / FRY_COUNT;
 }
 
 export function fryAt(t: number, fry: typeof fries[number]) {
   const elapsed = t - fry.start;
   if (elapsed < 0 || elapsed > fry.dur) return null;
   const p = elapsed / fry.dur;
-  return { x: lerp(fry.source.x, fry.targetX, p), y: fry.source.y + 10 * elapsed + 90 * elapsed ** 2, rotation: 70 + p * fry.spin };
+  return { x: lerp(fry.source.x, fry.targetX, p), y: fry.source.y + 4 * elapsed + 35 * elapsed ** 2, rotation: 70 + p * fry.spin };
 }
