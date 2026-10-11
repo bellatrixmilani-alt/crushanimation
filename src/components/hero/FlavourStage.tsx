@@ -65,7 +65,7 @@ export function FlavourStage({ onDone }: { onDone?: () => void }) {
       }
     };
     const onScroll = () => startIfVisible();
-    const observer = new IntersectionObserver(startIfVisible, { threshold: 0.35 });
+    const observer = new IntersectionObserver(startIfVisible, { threshold: [0, 0.15, 0.3, 0.5] });
     observer.observe(stage);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => {
