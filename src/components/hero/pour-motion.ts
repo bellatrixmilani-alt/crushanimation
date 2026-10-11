@@ -1,5 +1,5 @@
 export const POUR_START = 2.95;
-export const POUR_END = 4.8;
+export const POUR_END = 4.5;
 export const FRY_COUNT = 16;
 export const clamp = (value: number) => Math.max(0, Math.min(1, value));
 export const lerp = (a: number, b: number, p: number) => a + (b - a) * p;
