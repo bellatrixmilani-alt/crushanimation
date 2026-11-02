@@ -28,7 +28,9 @@ function noise(dur: number, type: BiquadFilterType, freq: number, gain: number, 
   g.gain.exponentialRampToValueAtTime(gain, t + Math.min(0.01, dur / 3));
   g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
   src.connect(f).connect(g).connect(ctx.destination);
-  src.start(t, Math.random() * 0.5, dur + 0.05);
+  // The buffer is 1s long: only offset while enough audio remains, or long sounds cut off.
+  const maxOffset = Math.max(0, 1 - (dur + 0.05));
+  src.start(t, Math.random() * maxOffset, dur + 0.05);
 }
 
 function tone(freq: number, dur: number, gain: number, endFreq?: number) {
@@ -56,4 +58,6 @@ export const sfx = {
   swoosh: () => noise(0.6, "bandpass", 400, 0.25, 3000),
   pop: () => { tone(500, 0.1, 0.3, 1200); },
   tick: () => tone(2400 + Math.random() * 1200, 0.04, 0.06),
+  // Two-note chime confirming sound was switched on, so the tap is never silent.
+  confirm: () => { tone(880, 0.09, 0.25, 1320); setTimeout(() => tone(1320, 0.14, 0.22), 90); },
 };
