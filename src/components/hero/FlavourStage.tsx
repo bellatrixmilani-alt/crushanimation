@@ -133,6 +133,8 @@ export function FlavourStage({ onDone }: { onDone?: () => void }) {
     enableSound();
     soundRef.current = true;
     setSound(true);
+    // Play right away: the tap must never be silent, even between effects.
+    sfx.confirm();
   };
 
   // ---- Derived scene state ----
