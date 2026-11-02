@@ -15,6 +15,7 @@ export function enableSound() {
 
 function noise(dur: number, type: BiquadFilterType, freq: number, gain: number, endFreq?: number) {
   if (!ctx || !noiseBuf) return;
+  if (ctx.state === "suspended") void ctx.resume();
   const t = ctx.currentTime;
   const src = ctx.createBufferSource();
   src.buffer = noiseBuf;
@@ -32,6 +33,7 @@ function noise(dur: number, type: BiquadFilterType, freq: number, gain: number, 
 
 function tone(freq: number, dur: number, gain: number, endFreq?: number) {
   if (!ctx) return;
+  if (ctx.state === "suspended") void ctx.resume();
   const t = ctx.currentTime;
   const o = ctx.createOscillator();
   o.frequency.setValueAtTime(freq, t);
@@ -45,10 +47,12 @@ function tone(freq: number, dur: number, gain: number, endFreq?: number) {
 }
 
 export const sfx = {
-  rattle: () => noise(0.035, "bandpass", 3500 + Math.random() * 1500, 0.35),
+  rattle: () => noise(0.04, "bandpass", 1400 + Math.random() * 900, 0.3),
   lid: () => { tone(700, 0.08, 0.3, 200); noise(0.05, "highpass", 2000, 0.3); },
-  pour: () => noise(1.85, "lowpass", 1800, 0.12, 600),
-  click: () => noise(0.015, "highpass", 4000, 0.12),
+  // Soft continuous rumble under the pour; the fry landings carry the clatter.
+  pour: () => noise(1.7, "lowpass", 800, 0.09, 320),
+  // Dull, hollow thud of a fry landing on the pile (was a sharp high hiss).
+  clatter: () => noise(0.05, "bandpass", 650 + Math.random() * 550, 0.2),
   swoosh: () => noise(0.6, "bandpass", 400, 0.25, 3000),
   pop: () => { tone(500, 0.1, 0.3, 1200); },
   tick: () => tone(2400 + Math.random() * 1200, 0.04, 0.06),

@@ -22,4 +22,15 @@ describe("connected pour", () => {
       previous = fill;
     }
   });
+  it("lands every fry inside the fixed bowl, later fries stacking higher", () => {
+    const first = fries[0];
+    const last = fries[fries.length - 1];
+    for (const fry of fries) {
+      expect(fry.targetX).toBeGreaterThan(10); // bowl spans 6%..40%
+      expect(fry.targetX).toBeLessThan(38);
+      expect(fry.targetY).toBeGreaterThan(40);
+      expect(fry.targetY).toBeLessThan(80);
+    }
+    expect(last.targetY).toBeLessThan(first.targetY);
+  });
 });

@@ -105,7 +105,7 @@ export function FlavourStage({ onDone }: { onDone?: () => void }) {
       if (nt > 0.5 && nt < 2.4 && Math.floor(nt * 12) !== Math.floor(p * 12)) sfx.rattle();
       if (crossed(2.5)) sfx.lid();
       if (crossed(POUR_START)) sfx.pour();
-      fries.forEach((f) => crossed(f.start + f.dur) && sfx.click());
+      fries.forEach((f) => crossed(f.start + f.dur) && sfx.clatter());
       if (crossed(5.8)) sfx.swoosh();
       [6.7, ...SWAPS].forEach((x) => { if (crossed(x)) { sfx.pop(); [0.05, 0.12, 0.2].forEach((d) => setTimeout(sfx.tick, d * 1000)); } });
     }
@@ -216,7 +216,7 @@ export function FlavourStage({ onDone }: { onDone?: () => void }) {
             alt=""
             draggable={false}
             className="absolute inset-0 w-full"
-            style={{ filter: f.bowl ? "none" : f.hue, clipPath: "inset(0 0 44% 0)", transform: `translateY(${lerp(58, 0, fill)}%)`, opacity: Math.min(1, fill * 12) }}
+            style={{ filter: f.bowl ? "none" : f.hue, clipPath: `inset(${(1 - fill) * 56}% 0 44% 0)`, opacity: Math.min(1, fill * 12) }}
           /></div>
           <img src={bowlEmpty} alt="" draggable={false} className="pointer-events-none absolute inset-0 z-[4] w-full" style={{ clipPath: "inset(58% 0 0 0)" }} />
           <img
