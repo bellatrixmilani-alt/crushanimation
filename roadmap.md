@@ -15,3 +15,4 @@
 - [x] Restore previous flavour animation with real fries, spoon collection, close pouring, shaking expression and hat-pattern bowl.
 - [x] Verify the restored animation and controls.
 - [x] Match the uploaded bowl reference: reposition the logo and remove the white bottom edge.
+- [x] Make "Tap for sound" confirm immediately with a chime and fix long-sound cutoff.
