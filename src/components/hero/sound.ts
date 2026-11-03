@@ -58,6 +58,4 @@ export const sfx = {
   swoosh: () => noise(0.6, "bandpass", 400, 0.25, 3000),
   pop: () => { tone(500, 0.1, 0.3, 1200); },
   tick: () => tone(2400 + Math.random() * 1200, 0.04, 0.06),
-  // Two-note chime confirming sound was switched on, so the tap is never silent.
-  confirm: () => { tone(880, 0.09, 0.25, 1320); setTimeout(() => tone(1320, 0.14, 0.22), 90); },
 };

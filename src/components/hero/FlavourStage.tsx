@@ -134,8 +134,14 @@ export function FlavourStage({ onDone }: { onDone?: () => void }) {
     enableSound();
     soundRef.current = true;
     setSound(true);
-    // Play right away: the tap must never be silent, even between effects.
-    sfx.confirm();
+    // No chime: bring the animation's own sound in immediately.
+    const Tnow = mode.kind === "static" ? END + 1 : t;
+    if (Tnow >= END) { restart(); return; }
+    if (Tnow >= 0.5 && Tnow < 2.4) sfx.rattle();
+    if (Tnow >= POUR_START && Tnow < 5.15) sfx.pour();
+    if (fries.some((fr) => fryAt(Tnow, fr))) sfx.clatter();
+    if (Tnow >= 5.8 && Tnow < 6.7) sfx.swoosh();
+    if (Tnow >= 6.7) { sfx.pop(); [0.05, 0.12, 0.2].forEach((d) => setTimeout(sfx.tick, d * 1000)); }
   };
 
   // ---- Derived scene state ----
