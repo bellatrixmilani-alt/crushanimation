@@ -21,10 +21,11 @@ export const FLAVOURS: Flavour[] = [
   { name: "Sweet Corn", tint: "var(--tint-corn)", hue: "saturate(0.6) brightness(1.25)" },
   { name: "Sour Cream & Onion", tint: "var(--tint-sco)", hue: "saturate(0.35) brightness(1.3)" },
   { name: "Chilly Lemon", tint: "var(--tint-lemon)", hue: "hue-rotate(8deg) saturate(0.7) brightness(1.2)" },
+  { name: "Kuku Peri Peri", tint: "var(--tint-peri)", hue: "hue-rotate(-18deg) saturate(1.35) brightness(0.92)" },
 ];
 
-const SWAPS = [7.4, 8.7, 10, 11.3]; // flavours 1..4
-const END = 12.6;
+const SWAPS = [7.4, 8.7, 10, 11.3, 12.6]; // flavours 1..5
+const END = 13.9;
 const COLLECT_DURATION = 1.4;
 
 type Mode = { kind: "auto" } | { kind: "static"; flavour: number; swapAt: number };
