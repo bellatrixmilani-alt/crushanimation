@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import wordmark from "@/assets/chipoz-wordmark.png.asset.json";
 import { FLAVOURS, FlavourStage } from "@/components/hero/FlavourStage";
 import { track } from "@/lib/track";
 
@@ -26,7 +27,9 @@ function Index() {
     <div className="min-h-screen">
       <header className="border-b-[3px] border-ink">
         <nav className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4">
-          <a href="/" className="font-display text-xl text-ink">CHIPOZ<span className="text-primary">.</span>AFRICA</a>
+          <a href="/" className="flex items-center">
+            <img src={wordmark.url} alt="Chipoz Africa" className="h-12 w-auto" draggable={false} />
+          </a>
           <ul className="hidden gap-7 text-sm font-semibold uppercase md:flex">
             {["Flavours", "Menu", "Story", "Locations"].map((l) => (
               <li key={l}><a href={`#${l.toLowerCase()}`} className="hover:text-primary">{l}</a></li>
