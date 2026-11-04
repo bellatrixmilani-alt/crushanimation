@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import wordmark from "@/assets/chipoz-wordmark.png.asset.json";
 import { FLAVOURS, FlavourStage } from "@/components/hero/FlavourStage";
 import { track } from "@/lib/track";
 
