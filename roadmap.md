@@ -16,3 +16,4 @@
 - [x] Verify the restored animation and controls.
 - [x] Match the uploaded bowl reference: reposition the logo and remove the white bottom edge.
 - [x] Make "Tap for sound" start the animation's own sound immediately (no chime).
+- [x] Replace the CHIPOZ.AFRICA nav text with the pasted CHIPOZ wordmark (mascot logo), and match the favicon to it.
